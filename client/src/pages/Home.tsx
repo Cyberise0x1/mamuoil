@@ -3,7 +3,7 @@
  * This page is a Mamu-specific energy journey: material oil, a 3D barrel, Zaria logistics,
  * and service capabilities are revealed through one continuous sticky scroll sequence.
  */
-import { ArrowDown, ArrowUpRight, ChevronLeft, ChevronRight, Droplet, Fuel, Handshake, MapPin, Menu, Orbit, Waypoints, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ChevronLeft, ChevronRight, Droplet, Fuel, Handshake, MapPin, Menu, MessageCircle, Orbit, Send, Waypoints, X } from "lucide-react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 const BarrelScene = lazy(() => import("@/components/BarrelScene"));
@@ -16,8 +16,8 @@ const navigation = [
 ];
 
 const capabilities = [
-  { kicker: "01 / Core supply", title: "Fuel supply", text: "A direct route for fuel supply conversations in and around Zaria.", Icon: Fuel },
-  { kicker: "02 / Product focus", title: "Kerosene", text: "Practical kerosene supply handled with measured service and a clear local point of contact.", Icon: Droplet },
+  { kicker: "01 / Core supply", title: "Fuel supply", text: "A direct route for fuel supply conversations in and around Zaria.", Icon: Fuel, image: "/manus-storage/mamu-depot-tankers_c7522131.jpg", imageAlt: "Fuel tanker vehicles at an editorial depot scene" },
+  { kicker: "02 / Product focus", title: "Kerosene", text: "Practical kerosene supply handled with measured service and a clear local point of contact.", Icon: Droplet, image: "/manus-storage/mamu-tanker-road_c810cb93.webp", imageAlt: "Fuel tanker on a Nigerian road in an editorial scene" },
   { kicker: "03 / Energy scope", title: "Oil & gas", text: "A corporate channel for wider oil-and-gas enquiries and service discussions.", Icon: Waypoints },
   { kicker: "04 / Local presence", title: "Zaria operation", text: "A Kaduna-rooted business positioned close to the movement it supports.", Icon: MapPin },
   { kicker: "05 / Direct channel", title: "Business enquiry", text: "A clear way to begin a conversation with the Mamu Oil team.", Icon: Handshake },
@@ -44,6 +44,13 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [barrelActive, setBarrelActive] = useState(false);
   const [activeCapability, setActiveCapability] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [enquirySubmitted, setEnquirySubmitted] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setLoading(false), 2100);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const cinema = cinemaRef.current;
@@ -133,8 +140,30 @@ export default function Home() {
     setActiveCapability((current) => (current + direction + capabilities.length) % capabilities.length);
   };
 
+  const submitEnquiry = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const enquiry = [
+      "Hello Mamu Oil, I would like to make an enquiry.",
+      "",
+      `Name: ${data.get("name")}`,
+      `Email: ${data.get("email")}`,
+      `Phone: ${data.get("phone") || "Not provided"}`,
+      `Service: ${data.get("service")}`,
+      "",
+      `Message: ${data.get("message")}`,
+    ].join("\n");
+    window.open(`https://wa.me/2348135010778?text=${encodeURIComponent(enquiry)}`, "_blank", "noopener,noreferrer");
+    setEnquirySubmitted(true);
+  };
+
   return (
     <div className="mamu-cinematic-site">
+      <div className={`oil-loader ${loading ? "" : "is-leaving"}`} role="status" aria-live="polite" aria-label="Preparing Mamu Oil experience">
+        <div className="loader-field"><span className="loader-thread" /><span className="loader-pool" /><span className="loader-drop" /></div>
+        <div className="loader-copy"><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /><span>Loading the current</span><b>01 / 01</b></div>
+        <button type="button" onClick={() => setLoading(false)}>Skip intro <ArrowUpRight size={14} /></button>
+      </div>
       <main id="origin">
         <section ref={cinemaRef} className="cinema-scroll" aria-label="Mamu Oil cinematic company story">
           <div ref={stageRef} className="cinema-stage">
@@ -214,8 +243,9 @@ export default function Home() {
               <div className="capability-heading"><p>03 / Capability cards</p><span>Swipe the current</span></div>
               <div className="capability-window">
                 <div className="capability-track" style={{ transform: `translateX(calc(-${activeCapability} * (min(74vw, 26rem) + 1.1rem)))` }}>
-                  {capabilities.map(({ kicker, title, text, Icon }, index) => (
-                    <article className={`capability-card ${index === activeCapability ? "is-active" : ""}`} key={title} tabIndex={0} onClick={() => setActiveCapability(index)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveCapability(index); } }}>
+                  {capabilities.map(({ kicker, title, text, Icon, image, imageAlt }, index) => (
+                    <article className={`capability-card ${image ? "capability-card--photo" : ""} ${index === activeCapability ? "is-active" : ""}`} key={title} tabIndex={0} onClick={() => setActiveCapability(index)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveCapability(index); } }}>
+                      {image && <img className="capability-photo" src={image} alt={imageAlt} />}
                       <p>{kicker}</p><Icon className="capability-icon" size={36} /><h3>{title}</h3><span>{text}</span>
                     </article>
                   ))}
@@ -231,7 +261,7 @@ export default function Home() {
         <section id="contact" className="after-cinema-contact" aria-labelledby="contact-title">
           <div className="after-contact-thread" aria-hidden="true" />
           <div className="after-contact-top"><span>Contact / Mamu Oil</span><span>mamuoil.com</span></div>
-          <div className="after-contact-content"><h2 id="contact-title">Begin at<br /><em>the source.</em></h2><div><p>For supply enquiries and direct business conversations, Mamu Oil is ready to hear from you.</p><a href="mailto:info@mamuoil.com" className="contact-cta">Contact Mamu Oil <ArrowUpRight size={17} /></a><span className="after-location"><MapPin size={14} /> Zaria, Kaduna, Nigeria</span></div></div>
+          <div className="after-contact-content"><h2 id="contact-title">Begin at<br /><em>the source.</em></h2><div className="contact-command"><div className="contact-command-intro"><p>Send your requirement directly to Mamu Oil on WhatsApp. Your enquiry is prepared with the details you provide below.</p><a href="https://wa.me/2348135010778?text=Hello%20Mamu%20Oil%2C%20I%20would%20like%20to%20make%20an%20enquiry." target="_blank" rel="noreferrer" className="contact-cta"><MessageCircle size={17} /> WhatsApp direct</a><span className="after-location"><MapPin size={14} /> Zaria, Kaduna, Nigeria</span></div><form className="contact-form" onSubmit={submitEnquiry}><div className="contact-form-top"><span>Enquiry form</span><span>WhatsApp handoff</span></div><label><span>Your name</span><input required name="name" autoComplete="name" placeholder="Full name" /></label><label><span>Email address</span><input required type="email" name="email" autoComplete="email" placeholder="name@company.com" /></label><label><span>Phone number</span><input type="tel" name="phone" autoComplete="tel" placeholder="Optional" /></label><label><span>Enquiry type</span><select required name="service" defaultValue=""><option value="" disabled>Select a requirement</option><option>Fuel supply</option><option>Kerosene supply</option><option>Oil &amp; gas enquiry</option><option>Business partnership</option><option>General enquiry</option></select></label><label className="contact-form-message"><span>Tell us what you need</span><textarea required name="message" rows={4} placeholder="Share the requirement, quantity, location, or business context." /></label><button className="contact-submit" type="submit"><Send size={15} /> Send via WhatsApp</button>{enquirySubmitted && <p className="form-status" role="status">Your WhatsApp enquiry is ready to send in the newly opened window.</p>}</form></div></div>
           <img className="after-contact-mark" src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" />
         </section>
       </main>

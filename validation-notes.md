@@ -9,3 +9,7 @@ The operations state was also checked directly. The Zaria-to-movement heading, d
 At the final capability state, the dark refinery backdrop remains visible under the cream capability cards. The fuel-supply card is legible, the next card is staged in view to establish the rail, and both circular controls are exposed for touch or pointer navigation.
 
 Mobile preview exposed a browser-specific WebGL failure surface. A branded, oil-barrel fallback now replaces the canvas below 560px so the opening remains material, intentional, and readable even without WebGL support.
+
+The enhanced opening exposes the branded `Loading the current` sequence with an optional skip control before the cinematic stage. The live contact panel presents the WhatsApp direct link, five form controls, and the dedicated `Send via WhatsApp` action in a legible dark-glass command surface.
+
+The capability-card content includes deployed depot and road-tanker photography as editorial operational context. The form builds a structured enquiry from the visitor’s inputs and opens a prefilled WhatsApp message to the publicly listed Mamu Oil contact number; the number should be reconfirmed before publication.
