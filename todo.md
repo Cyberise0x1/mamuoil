@@ -13,3 +13,7 @@
 - [x] Build a branded oil-drop loader before the 3D cinematic experience.
 - [x] Add a validated client-side enquiry form that hands the submitted message to WhatsApp.
 - [x] Recheck loading, form, slider, mobile presentation, and the Vercel production build.
+
+## Confirmed Contact Correction
+
+- [x] Replace the WhatsApp handoff number with +234 810 073 7315 and verify the build.

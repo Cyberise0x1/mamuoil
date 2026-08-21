@@ -12,4 +12,4 @@ Mobile preview exposed a browser-specific WebGL failure surface. A branded, oil-
 
 The enhanced opening exposes the branded `Loading the current` sequence with an optional skip control before the cinematic stage. The live contact panel presents the WhatsApp direct link, five form controls, and the dedicated `Send via WhatsApp` action in a legible dark-glass command surface.
 
-The capability-card content includes deployed depot and road-tanker photography as editorial operational context. The form builds a structured enquiry from the visitor’s inputs and opens a prefilled WhatsApp message to the publicly listed Mamu Oil contact number; the number should be reconfirmed before publication.
+The capability-card content includes deployed depot and road-tanker photography as editorial operational context. The form builds a structured enquiry from the visitor’s inputs and opens a prefilled WhatsApp message to the user-confirmed Mamu Oil contact number.
