@@ -38,3 +38,10 @@
 - [x] Apply a gold-and-platinum luxury material system across the page without diluting Mamu’s commercial clarity.
 - [x] Add GSAP-grade entrance, scroll, hover, and route-flow choreography with reduced-motion support.
 - [x] Validate visual performance, responsive behavior, and the Vercel production build.
+
+## Luxury Refinery Hero Video
+
+- [x] Source and vet a refinery video with an appropriate commercial-use license and a wide hero composition.
+- [x] Upload the refined hero video to persistent web storage and integrate it behind the Three.js barrel.
+- [x] Tune the platinum-gold grading, overlays, fallback image, and mobile behavior for legibility and performance.
+- [x] Verify video loading, responsive presentation, and the Vercel production build.
