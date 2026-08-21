@@ -79,3 +79,33 @@ The mark is a **monolithic M** cut by a single liquid channel. The wordmark pair
 - Imagery rule: material macro imagery is balanced with operational context — routes, tanker movement, products, or Zaria/Kaduna signals — so Petroleum Noir remains specifically Mamu Oil.
 - Every full-screen scroll segment carries a functional operational artefact: a product signal, route trace, data capsule, capability card, or M-channel mark.
 - The hero uses a left editorial rail and right material object, with amber threads visibly pulling the visitor into the supply and operations stages.
+
+## Executive Visual Reset — Amber Horizon
+
+### Design Movement
+**Contemporary African corporate editorialism**, with the calm luminosity of high-end infrastructure brands and the crisp detail of premium financial and mobility experiences.
+
+### Reset Principles
+1. **Light leads:** Soft ivory, mineral white, and pale sand create an open executive canvas. Charcoal is reserved for typography and structural contrast, rather than used as the page’s dominant field.
+2. **Swift clarity:** The site responds quickly. Motion is concise, physical, and informative, never slow, floaty, or ornamental.
+3. **Trust through proof:** Real operational photography, considered metrics, and clear enquiry access carry more authority than atmospheric darkness.
+4. **Purposeful glass:** Translucent surfaces are bright, clean data lenses layered over photography and warm-gradient fields.
+
+### Layout Paradigm
+The homepage becomes a **light-to-amber energy route**: an expansive editorial hero, an elevated capabilities strip, a photographic operations spread, and a high-contrast contact command panel. Sections are connected by a warm amber path line and subtle M-channel geometry, not by long sticky dark intervals.
+
+### Typography System
+DM Serif Display remains the composed executive voice, now paired with stronger, dark ink headlines on warm light backgrounds. Manrope becomes the precise data and interface layer. Generous but compact line lengths keep the page direct.
+
+### Animation
+Use responsive 180–360ms transitions for controls and card interactions. Use 450–700ms scroll reveals with a fast ease-out. The opening loader resolves quickly, and the 3D barrel becomes a concise hero accent rather than the pace-defining experience.
+
+### Visual Direction
+**Mamu Amber #D9852E** becomes a confident structural color against `#F6F1E8` mineral white, `#E6DFD2` sand, and `#17211F` graphite green. The logo and M-channel mark appear as quiet editorial stamps across light surfaces.
+
+## Style Decisions
+
+- **Amber Horizon is the prevailing visual system.** Petroleum Noir is restricted to contained contrast moments, particularly the contact command panel and tightly controlled material detail.
+- The barrel is a **refined material accent**, never the hero’s dominant mass. Operational photography, route labels, and enquiry access lead the opening hierarchy.
+- An amber M-channel route with markers must connect hero, capabilities, operations, and contact as one clear supply path.
+- All copy speaks in the voice of an active operator: supply, product, route, Zaria, response, and enquiry—never the website or interface.

@@ -17,3 +17,10 @@
 ## Confirmed Contact Correction
 
 - [x] Replace the WhatsApp handoff number with +234 810 073 7315 and verify the build.
+
+## Executive Visual Reset
+
+- [x] Replace the dark cinematic-first art direction with a light, editorial, executive energy-brand system.
+- [x] Recompose the homepage around clearer premium hierarchy, stronger imagery, and purposeful glass data layers.
+- [x] Replace slow/heavy transitions with swift, responsive motion and a more direct interactive flow.
+- [x] Validate desktop and mobile presentation, interactions, and the Vercel production build.
