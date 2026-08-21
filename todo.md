@@ -30,3 +30,11 @@
 - [x] Add restrained glass depth, light refraction, and data-layer treatment to service capability cards.
 - [x] Add swift hover, focus, and selection states that improve service exploration without slowing the page.
 - [x] Verify the interactions on desktop and touch-friendly responsive layouts, then run the Vercel build.
+
+## Gold & Platinum Motion Upgrade
+
+- [x] Review the requested motion, glass, and design references and capture reusable luxury interaction patterns.
+- [x] Upgrade the Three.js barrel into a premium oil-liquid scene with physically suggestive droplet and splash motion.
+- [x] Apply a gold-and-platinum luxury material system across the page without diluting Mamu’s commercial clarity.
+- [x] Add GSAP-grade entrance, scroll, hover, and route-flow choreography with reduced-motion support.
+- [x] Validate visual performance, responsive behavior, and the Vercel production build.
