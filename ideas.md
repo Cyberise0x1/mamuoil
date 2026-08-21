@@ -77,3 +77,5 @@ The mark is a **monolithic M** cut by a single liquid channel. The wordmark pair
 - Copy voice: Mamu Oil speaks as an active Zaria-rooted fuel and oil operator. It never describes the website, a concept, a section, or a future digital presence.
 - Layout rule: every major section connects to the next with an amber current, route marker, or numbered operational trace.
 - Imagery rule: material macro imagery is balanced with operational context — routes, tanker movement, products, or Zaria/Kaduna signals — so Petroleum Noir remains specifically Mamu Oil.
+- Every full-screen scroll segment carries a functional operational artefact: a product signal, route trace, data capsule, capability card, or M-channel mark.
+- The hero uses a left editorial rail and right material object, with amber threads visibly pulling the visitor into the supply and operations stages.

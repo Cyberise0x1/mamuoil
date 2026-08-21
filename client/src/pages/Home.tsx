@@ -1,170 +1,241 @@
 /**
- * MAMU OIL — PETROLEUM NOIR DESIGN CONTRACT
- * The page is an asymmetric energy current: black mineral fields, Mamu Amber traces,
- * editorial type, and glass only where it communicates a live or navigational layer.
+ * MAMU OIL — PETROLEUM NOIR / CINEMATIC SCROLL DESIGN CONTRACT
+ * This page is a Mamu-specific energy journey: material oil, a 3D barrel, Zaria logistics,
+ * and service capabilities are revealed through one continuous sticky scroll sequence.
  */
-import { ArrowDown, ArrowUpRight, Droplets, Fuel, MapPin, Menu, Orbit, X } from "lucide-react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { ArrowDown, ArrowUpRight, ChevronLeft, ChevronRight, Droplet, Fuel, Handshake, MapPin, Menu, Orbit, Waypoints, X } from "lucide-react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 const BarrelScene = lazy(() => import("@/components/BarrelScene"));
 
 const navigation = [
-  { label: "Standard", href: "#standard" },
+  { label: "Origin", href: "#origin" },
+  { label: "Supply", href: "#supply" },
   { label: "Operations", href: "#operations" },
   { label: "Contact", href: "#contact" },
 ];
 
+const capabilities = [
+  { kicker: "01 / Core supply", title: "Fuel supply", text: "A direct route for fuel supply conversations in and around Zaria.", Icon: Fuel },
+  { kicker: "02 / Product focus", title: "Kerosene", text: "Practical kerosene supply handled with measured service and a clear local point of contact.", Icon: Droplet },
+  { kicker: "03 / Energy scope", title: "Oil & gas", text: "A corporate channel for wider oil-and-gas enquiries and service discussions.", Icon: Waypoints },
+  { kicker: "04 / Local presence", title: "Zaria operation", text: "A Kaduna-rooted business positioned close to the movement it supports.", Icon: MapPin },
+  { kicker: "05 / Direct channel", title: "Business enquiry", text: "A clear way to begin a conversation with the Mamu Oil team.", Icon: Handshake },
+];
+
+const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+const smoothstep = (start: number, end: number, value: number) => {
+  const t = clamp((value - start) / (end - start));
+  return t * t * (3 - 2 * t);
+};
+const segment = (value: number, enterStart: number, enterEnd: number, exitStart: number, exitEnd: number) => {
+  const enter = smoothstep(enterStart, enterEnd, value);
+  const exit = smoothstep(exitStart, exitEnd, value);
+  return { enter, exit, active: enter * (1 - exit) };
+};
+
 export default function Home() {
-  const [scrolled, setScrolled] = useState(false);
+  const cinemaRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const targetScroll = useRef(0);
+  const smoothScroll = useRef(0);
+  const pointer = useRef({ targetX: 0, targetY: 0, x: 0, y: 0 });
+  const animationFrame = useRef(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [barrelActive, setBarrelActive] = useState(false);
+  const [activeCapability, setActiveCapability] = useState(0);
 
   useEffect(() => {
-    const updateHeader = () => setScrolled(window.scrollY > 24);
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
-    return () => window.removeEventListener("scroll", updateHeader);
+    const cinema = cinemaRef.current;
+    const stage = stageRef.current;
+    if (!cinema || !stage) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let initialized = false;
+
+    const requestTick = () => {
+      if (!animationFrame.current) animationFrame.current = window.requestAnimationFrame(update);
+    };
+
+    const update = () => {
+      animationFrame.current = 0;
+      const maxScroll = Math.max(1, cinema.offsetHeight - window.innerHeight);
+      const scrolled = clamp(-cinema.getBoundingClientRect().top, 0, maxScroll);
+      targetScroll.current = scrolled;
+      smoothScroll.current = !initialized || reducedMotion.matches
+        ? scrolled
+        : smoothScroll.current + (scrolled - smoothScroll.current) * 0.13;
+      initialized = true;
+      if (Math.abs(smoothScroll.current - scrolled) < 0.08) smoothScroll.current = scrolled;
+
+      const motion = reducedMotion.matches ? 0 : 1;
+      pointer.current.x += (pointer.current.targetX - pointer.current.x) * (reducedMotion.matches ? 1 : 0.12);
+      pointer.current.y += (pointer.current.targetY - pointer.current.y) * (reducedMotion.matches ? 1 : 0.12);
+
+      const scroll = smoothScroll.current;
+      const progress = clamp(scroll / maxScroll);
+      const supply = segment(scroll, 460, 860, 1360, 1640);
+      const operations = segment(scroll, 1560, 1960, 2580, 2820);
+      const capabilitiesEnter = smoothstep(2780, 3440, scroll);
+      const capabilityPower = Math.pow(capabilitiesEnter, 1.42);
+
+      stage.style.setProperty("--scroll-progress", progress.toFixed(4));
+      stage.style.setProperty("--pointer-x", `${(pointer.current.x * motion).toFixed(4)}`);
+      stage.style.setProperty("--pointer-y", `${(pointer.current.y * motion).toFixed(4)}`);
+      stage.style.setProperty("--intro-opacity", `${(1 - smoothstep(60, 620, scroll)).toFixed(4)}`);
+      stage.style.setProperty("--intro-y", `${smoothstep(60, 620, scroll) * -12}vh`);
+      stage.style.setProperty("--barrel-opacity", `${(1 - smoothstep(1180, 1660, scroll)).toFixed(4)}`);
+      stage.style.setProperty("--barrel-y", `${progress * -8 - supply.exit * 30}vh`);
+      stage.style.setProperty("--barrel-scale", `${(1 + progress * 0.3 + supply.enter * 0.22).toFixed(4)}`);
+      stage.style.setProperty("--macro-opacity", `${supply.active.toFixed(4)}`);
+      stage.style.setProperty("--macro-scale", `${(1.06 + supply.enter * 0.08 + supply.exit * 0.08).toFixed(4)}`);
+      stage.style.setProperty("--route-opacity", `${operations.active.toFixed(4)}`);
+      stage.style.setProperty("--route-scale", `${(1.02 + operations.enter * 0.11).toFixed(4)}`);
+      stage.style.setProperty("--supply-opacity", `${supply.active.toFixed(4)}`);
+      stage.style.setProperty("--supply-y", `${(1 - supply.enter) * 4 - supply.exit * 8}vh`);
+      stage.style.setProperty("--operations-opacity", `${operations.active.toFixed(4)}`);
+      stage.style.setProperty("--operations-y", `${(1 - operations.enter) * 4 - operations.exit * 8}vh`);
+      stage.style.setProperty("--capabilities-opacity", `${capabilityPower.toFixed(4)}`);
+      stage.style.setProperty("--capabilities-x", `${(1 - capabilityPower) * 115}vw`);
+      stage.style.setProperty("--scene-shade", `${(supply.active * 0.55 + operations.active * 0.4).toFixed(4)}`);
+
+      if (
+        Math.abs(smoothScroll.current - targetScroll.current) > 0.08 ||
+        Math.abs(pointer.current.x - pointer.current.targetX) > 0.001 ||
+        Math.abs(pointer.current.y - pointer.current.targetY) > 0.001
+      ) requestTick();
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      pointer.current.targetX = event.clientX / window.innerWidth - 0.5;
+      pointer.current.targetY = event.clientY / window.innerHeight - 0.5;
+      requestTick();
+    };
+    const onScroll = () => requestTick();
+    const onMotionChange = () => { initialized = false; requestTick(); };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    reducedMotion.addEventListener("change", onMotionChange);
+    requestTick();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
+      reducedMotion.removeEventListener("change", onMotionChange);
+      if (animationFrame.current) window.cancelAnimationFrame(animationFrame.current);
+    };
   }, []);
 
-  const closeMenu = () => setMenuOpen(false);
+  const moveCapability = (direction: number) => {
+    setActiveCapability((current) => (current + direction + capabilities.length) % capabilities.length);
+  };
 
   return (
-    <div className="mamu-site">
-      <header className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}>
-        <a className="brand" href="#top" aria-label="Mamu Oil home">
-          <img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="Mamu Oil monogram" className="brand-mark" />
-          <span className="brand-lockup"><strong>MAMU</strong><span>OIL</span></span>
-        </a>
-
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
-        </nav>
-
-        <a className="header-contact" href="#contact">Talk to Mamu <ArrowUpRight size={15} /></a>
-
-        <button
-          className="menu-trigger"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-navigation"
-          aria-label="Toggle navigation"
-        >
-          {menuOpen ? <X size={21} /> : <Menu size={22} />}
-        </button>
-
-        <nav id="mobile-navigation" className={`mobile-nav ${menuOpen ? "mobile-nav--open" : ""}`} aria-label="Mobile navigation">
-          {navigation.map((item) => <a key={item.href} href={item.href} onClick={closeMenu}>{item.label}</a>)}
-          <a href="#contact" onClick={closeMenu}>Talk to Mamu <ArrowUpRight size={16} /></a>
-        </nav>
-      </header>
-
-      <main id="top">
-        <section className="hero-section" aria-labelledby="hero-title">
-          <div className="hero-image" aria-hidden="true" />
-          <div className="hero-shade" aria-hidden="true" />
-          <div className="hero-grid" aria-hidden="true" />
-          <div className="energy-trace energy-trace--hero" aria-hidden="true" />
-
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="status-dot" /> Zaria, Kaduna <span className="eyebrow-divider">/</span> Nigeria</p>
-            <h1 id="hero-title">Energy, carried<br /><em>with purpose.</em></h1>
-            <p className="hero-description">Fuel, kerosene and oil &amp; gas supply from Zaria, Kaduna — carried with steady service and a clear local point of contact.</p>
-            <div className="hero-actions">
-              <a className="button button--primary" href="#standard">Enter the flow <ArrowDown size={16} /></a>
-              <a className="button button--text" href="#contact">Make an enquiry <ArrowUpRight size={16} /></a>
+    <div className="mamu-cinematic-site">
+      <main id="origin">
+        <section ref={cinemaRef} className="cinema-scroll" aria-label="Mamu Oil cinematic company story">
+          <div ref={stageRef} className="cinema-stage">
+            <div className="cinema-world">
+              <img className="scene-image scene-image--hero" src="/manus-storage/mamu-hero-refinery_0e61d36e.jpg" alt="" />
+              <div className="scene-grain" aria-hidden="true" />
+              <div className="scene-amber-thread scene-amber-thread--one" aria-hidden="true" />
+              <div className="scene-amber-thread scene-amber-thread--two" aria-hidden="true" />
+              <div className="scene-vignette" aria-hidden="true" />
             </div>
-          </div>
 
-          <div className="hero-3d" aria-label="Interactive three-dimensional oil barrel scene. Drag to inspect the barrel.">
-            <Suspense fallback={<div className="scene-fallback" aria-hidden="true"><span /></div>}>
-              <BarrelScene onExplore={() => setBarrelActive(true)} />
-            </Suspense>
-            <div className={`scene-readout ${barrelActive ? "scene-readout--active" : ""}`}>
-              <Orbit size={13} />
-              <span>{barrelActive ? "Barrel mode: active" : "Drag to explore"}</span>
+            <header className="cinema-header" aria-label="Primary navigation">
+              <a className="cinema-brand" href="#origin" aria-label="Mamu Oil home">
+                <img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="Mamu Oil monogram" />
+                <span><strong>MAMU</strong><i>OIL</i></span>
+              </a>
+              <nav className="cinema-nav" aria-label="Main menu">
+                {navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
+              </nav>
+              <a className="cinema-contact-link" href="#contact">Talk to Mamu <ArrowUpRight size={14} /></a>
+              <button className="cinema-menu" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
+                {menuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+              <nav className={`cinema-mobile-nav ${menuOpen ? "is-open" : ""}`} aria-label="Mobile navigation">
+                {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}
+                <a href="#contact" onClick={() => setMenuOpen(false)}>Talk to Mamu <ArrowUpRight size={15} /></a>
+              </nav>
+            </header>
+
+            <div className="cinema-title-group">
+              <p className="cinema-kicker"><span /> Zaria, Kaduna <b>/</b> Nigeria</p>
+              <h1>MAMU<span>OIL</span></h1>
+              <p className="cinema-subtitle">Energy in motion.</p>
             </div>
-            <div className="scene-index"><span>01</span><span>03D</span></div>
-          </div>
 
-          <div className="hero-footnote">Scroll to follow the current <ArrowDown size={16} /></div>
-        </section>
+            <aside className="operator-rail" aria-label="Mamu Oil operational profile">
+              <div className="operator-rail-head"><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /><span>OP / 01</span></div>
+              <div className="operator-rail-line" aria-hidden="true"><i /></div>
+              <p>Operator signal</p>
+              <strong>Zaria, Kaduna</strong>
+              <span>Fuel / Kerosene / Oil &amp; Gas</span>
+            </aside>
 
-        <section className="signal-strip" aria-label="Mamu Oil snapshot">
-          <div><span>01</span><p><strong>Local presence</strong>Zaria, Kaduna</p></div>
-          <div><span>02</span><p><strong>Energy focus</strong>Fuel, kerosene &amp; oil</p></div>
-          <div><span>03</span><p><strong>Digital direction</strong>Clarity in motion</p></div>
-        </section>
+            <section className="cinema-intro" aria-label="Mamu Oil overview">
+              <p>Fuel, kerosene and oil &amp; gas supply from a Zaria-rooted operation — carried with clear service and purposeful movement.</p>
+              <div className="cinema-tags" aria-label="Mamu Oil highlights"><span>Fuel supply</span><span>Kerosene</span><span>Oil &amp; Gas</span></div>
+            </section>
 
-        <section id="standard" className="standard-section section-shell" aria-labelledby="standard-title">
-          <div className="section-kicker"><span><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /> 01 — The Mamu Standard</span><span>Supply / Service / Zaria</span></div>
-          <div className="section-route section-route--standard" aria-hidden="true"><span>01</span><i /><b /></div>
-          <div className="standard-heading">
-            <h2 id="standard-title">A material<br /><em>way forward.</em></h2>
-            <p>From fuel to kerosene, every supply conversation begins with the same standard: dependable movement, deliberate service, and a direct connection to the needs of Zaria.</p>
-          </div>
-
-          <div className="standard-stage">
-            <figure className="oil-figure">
-              <img src="/manus-storage/mamu-oil-macro_90e7a115.jpg" alt="A suspended black oil droplet above a glossy oil surface" />
-              <figcaption><span>Material study</span><span>Black / Amber / Light</span></figcaption>
-            </figure>
-
-            <div className="principles-list">
-              <article>
-                <div className="principle-icon"><Fuel size={20} /></div>
-                <span>01</span>
-                <h3>Fuel provision</h3>
-                <p>Fuel supply for the daily movement of people, businesses and essential local activity.</p>
-              </article>
-              <article>
-                <div className="principle-icon"><Droplets size={20} /></div>
-                <span>02</span>
-                <h3>Product focus</h3>
-                <p>Kerosene and oil &amp; gas supply handled with the focus and service discipline the work requires.</p>
-              </article>
-              <article>
-                <div className="principle-icon"><MapPin size={20} /></div>
-                <span>03</span>
-                <h3>Rooted clarity</h3>
-                <p>A Zaria-based operation with a clear local route for supply enquiries and business conversations.</p>
-              </article>
+            <div className="cinema-barrel" aria-label="Interactive three-dimensional oil barrel. Drag to inspect.">
+              <Suspense fallback={<div className="barrel-loading" aria-hidden="true"><span /></div>}>
+                <BarrelScene onExplore={() => setBarrelActive(true)} />
+              </Suspense>
+              <div className="mobile-barrel-fallback" aria-hidden="true"><span /><i /><b /></div>
+              <div className={`barrel-readout ${barrelActive ? "is-active" : ""}`}><Orbit size={13} /> {barrelActive ? "Barrel mode active" : "Drag to explore"}</div>
             </div>
+
+            <div className="scene-macro" aria-hidden="true"><img src="/manus-storage/mamu-oil-macro_90e7a115.jpg" alt="" /></div>
+            <div className="scene-route" aria-hidden="true"><img src="/manus-storage/mamu-route-operations_ffcc3088.jpg" alt="" /><div className="route-trace"><span /><i /><span /></div></div>
+            <div className="scene-route-stamp" aria-hidden="true"><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /><span>Zaria route / 01</span></div>
+            <div className="scene-shade" aria-hidden="true" />
+
+            <section id="supply" className="cinema-story cinema-story--supply" aria-label="Supply story">
+              <p className="story-kicker">01 / Direct supply</p>
+              <h2>A steady current.<br /><em>Built locally.</em></h2>
+              <p className="story-copy">Mamu Oil keeps its service focused on what matters: a direct fuel and kerosene supply conversation, handled with confidence from Zaria.</p>
+              <dl className="story-facts"><div><dt>Fuel</dt><dd>Direct supply focus</dd></div><div><dt>Local</dt><dd>Zaria, Kaduna</dd></div></dl>
+            </section>
+
+            <section id="operations" className="cinema-story cinema-story--operations" aria-label="Operations story">
+              <p className="story-kicker">02 / Operations</p>
+              <h2>From Zaria.<br /><em>Into movement.</em></h2>
+              <p className="story-copy">A Nigerian energy business with a clear local route for fuel, kerosene and oil &amp; gas enquiries — connecting essential supply to the activity it serves.</p>
+              <a className="story-button" href="#contact"><span>↗</span><span>Talk supply with Mamu</span></a>
+            </section>
+
+            <section className="capability-slider" aria-label="Mamu Oil capabilities">
+              <div className="capability-heading"><p>03 / Capability cards</p><span>Swipe the current</span></div>
+              <div className="capability-window">
+                <div className="capability-track" style={{ transform: `translateX(calc(-${activeCapability} * (min(74vw, 26rem) + 1.1rem)))` }}>
+                  {capabilities.map(({ kicker, title, text, Icon }, index) => (
+                    <article className={`capability-card ${index === activeCapability ? "is-active" : ""}`} key={title} tabIndex={0} onClick={() => setActiveCapability(index)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveCapability(index); } }}>
+                      <p>{kicker}</p><Icon className="capability-icon" size={36} /><h3>{title}</h3><span>{text}</span>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div className="capability-controls"><button onClick={() => moveCapability(-1)} aria-label="Previous capability"><ChevronLeft size={21} /></button><button onClick={() => moveCapability(1)} aria-label="Next capability"><ChevronRight size={21} /></button></div>
+            </section>
+
+            <div className="cinema-scroll-cue">Follow the current <ArrowDown size={15} /></div>
           </div>
         </section>
 
-        <section id="operations" className="operations-section" aria-labelledby="operations-title">
-          <div className="operations-image-wrap">
-            <img src="/manus-storage/mamu-route-operations_ffcc3088.jpg" alt="Northern Nigerian road at golden hour, representing energy movement" />
-            <div className="route-overlay" aria-hidden="true"><span className="route-node route-node--start" /><span className="route-line" /><span className="route-node route-node--end" /></div>
-          </div>
-          <div className="operations-copy">
-            <p className="eyebrow">02 / Operations</p>
-            <h2 id="operations-title">From the source.<br /><em>Into the city.</em></h2>
-            <p>Fuel, kerosene and oil &amp; gas supply move through a Zaria-rooted network with the same aim: keep the route clear, keep the service direct, keep Kaduna moving.</p>
-            <div className="operations-tags" aria-label="Operations profile"><span>Fuel / Kerosene / Oil &amp; Gas</span><span>Zaria → Kaduna</span><span><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /> Mamu route</span></div>
-            <a className="underlined-link" href="#contact">Talk supply with Mamu <ArrowUpRight size={16} /></a>
-          </div>
-        </section>
-
-        <section id="contact" className="contact-section" aria-labelledby="contact-title">
-          <div className="contact-glow" aria-hidden="true" />
-          <div className="contact-topline"><span>03 — A clear next move</span><span>mamuoil.com</span></div>
-          <div className="contact-content">
-            <h2 id="contact-title">Start at<br /><em>the source.</em></h2>
-            <div className="contact-details">
-              <p>For supply enquiries and direct business conversations, Mamu Oil is ready to hear from you.</p>
-              <a className="button button--primary" href="mailto:info@mamuoil.com">Contact Mamu Oil <ArrowUpRight size={17} /></a>
-              <div className="location-line"><MapPin size={15} /><span>Zaria, Kaduna, Nigeria</span></div>
-            </div>
-          </div>
-          <div className="contact-mark"><img src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" /></div>
+        <section id="contact" className="after-cinema-contact" aria-labelledby="contact-title">
+          <div className="after-contact-thread" aria-hidden="true" />
+          <div className="after-contact-top"><span>Contact / Mamu Oil</span><span>mamuoil.com</span></div>
+          <div className="after-contact-content"><h2 id="contact-title">Begin at<br /><em>the source.</em></h2><div><p>For supply enquiries and direct business conversations, Mamu Oil is ready to hear from you.</p><a href="mailto:info@mamuoil.com" className="contact-cta">Contact Mamu Oil <ArrowUpRight size={17} /></a><span className="after-location"><MapPin size={14} /> Zaria, Kaduna, Nigeria</span></div></div>
+          <img className="after-contact-mark" src="/manus-storage/mamu-mark_cf6cfd10.png" alt="" />
         </section>
       </main>
-
-      <footer className="site-footer">
-        <p>© {new Date().getFullYear()} Mamu Oil. Zaria, Kaduna.</p>
-        <a href="#top">Back to top <ArrowUpRight size={14} /></a>
-      </footer>
+      <footer className="cinema-footer"><span>© {new Date().getFullYear()} Mamu Oil. Zaria, Kaduna.</span><a href="#origin">Back to origin <ArrowUpRight size={14} /></a></footer>
     </div>
   );
 }
