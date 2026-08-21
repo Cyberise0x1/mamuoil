@@ -109,3 +109,4 @@ Use responsive 180–360ms transitions for controls and card interactions. Use 4
 - The barrel is a **refined material accent**, never the hero’s dominant mass. Operational photography, route labels, and enquiry access lead the opening hierarchy.
 - An amber M-channel route with markers must connect hero, capabilities, operations, and contact as one clear supply path.
 - All copy speaks in the voice of an active operator: supply, product, route, Zaria, response, and enquiry—never the website or interface.
+- Capability cards use **bright glass depth** only as an interaction affordance: a soft refractive highlight follows pointer movement, selected cards lift subtly, and motion resolves within 240ms.

@@ -89,6 +89,12 @@ export default function Home() {
     setActiveCapability((current) => (current + direction + capabilities.length) % capabilities.length);
   };
 
+  const moveGlassHighlight = (event: React.PointerEvent<HTMLElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--glass-x", `${((event.clientX - bounds.left) / bounds.width) * 100}%`);
+    event.currentTarget.style.setProperty("--glass-y", `${((event.clientY - bounds.top) / bounds.height) * 100}%`);
+  };
+
   const submitEnquiry = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -194,7 +200,7 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            <article className="capability-feature" aria-live="polite">
+            <article className="capability-feature" aria-live="polite" onPointerMove={moveGlassHighlight} onPointerLeave={(event) => { event.currentTarget.style.removeProperty("--glass-x"); event.currentTarget.style.removeProperty("--glass-y"); }}>
               <img src={active.image} alt="" />
               <div className="capability-feature-wash" aria-hidden="true" />
               <div className="capability-feature-content"><p>{active.number} / {active.label}</p><ActiveIcon size={30} /><h3>{active.title}</h3><span>{active.text}</span></div>

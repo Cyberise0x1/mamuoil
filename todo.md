@@ -24,3 +24,9 @@
 - [x] Recompose the homepage around clearer premium hierarchy, stronger imagery, and purposeful glass data layers.
 - [x] Replace slow/heavy transitions with swift, responsive motion and a more direct interactive flow.
 - [x] Validate desktop and mobile presentation, interactions, and the Vercel production build.
+
+## Capability Glass Interaction
+
+- [x] Add restrained glass depth, light refraction, and data-layer treatment to service capability cards.
+- [x] Add swift hover, focus, and selection states that improve service exploration without slowing the page.
+- [x] Verify the interactions on desktop and touch-friendly responsive layouts, then run the Vercel build.
