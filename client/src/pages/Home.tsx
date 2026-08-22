@@ -277,7 +277,7 @@ export default function Home() {
             <h2 id="operations-title" data-gsap-reveal>Built for the<br /><em>business of movement.</em></h2>
             <p data-gsap-reveal>From a Zaria-rooted operating position, Mamu Oil provides a clear channel for fuel, kerosene, and oil-and-gas enquiries—grounded in local context and handled with direct communication.</p>
             <dl data-gsap-reveal><div><dt>Fuel</dt><dd>Direct supply focus</dd></div><div><dt>Zaria</dt><dd>Kaduna, Nigeria</dd></div></dl>
-            <div className="operations-proof-grid" aria-label="Mamu Oil operational response channels"><div><span>01</span><strong>Zaria service desk</strong><small>Local response channel</small></div><div><span>02</span><strong>Product enquiry</strong><small>Fuel · Kerosene · Oil &amp; Gas</small></div><div><span>03</span><strong>Direct handoff</strong><small>WhatsApp-ready response</small></div></div>
+            <div className="operations-proof-grid" aria-label="Mamu Oil operational response channels"><div><span>01</span><strong>HQ-Zaria service desk</strong><small>Local response channel</small></div><div><span>02</span><strong>Product enquiry</strong><small>Fuel · Kerosene · Oil &amp; Gas</small></div><div><span>03</span><strong>Direct handoff</strong><small>WhatsApp-ready response</small></div></div>
             <a className="button button--amber" href="#contact" data-gsap-reveal>Open a supply enquiry <ArrowRight size={16} /></a>
           </div>
         </section>

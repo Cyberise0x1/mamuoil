@@ -45,3 +45,8 @@
 - [x] Upload the refined hero video to persistent web storage and integrate it behind the Three.js barrel.
 - [x] Tune the platinum-gold grading, overlays, fallback image, and mobile behavior for legibility and performance.
 - [x] Verify video loading, responsive presentation, and the Vercel production build.
+
+## HQ-Zaria Label Confirmation
+
+- [x] Verify the updated HQ-Zaria service desk label in the operations proof panel.
+- [x] Run the production build and save the user-edited checkpoint.
