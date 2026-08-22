@@ -50,3 +50,8 @@
 
 - [x] Verify the updated HQ-Zaria service desk label in the operations proof panel.
 - [x] Run the production build and save the user-edited checkpoint.
+
+## Static Hero Restoration
+
+- [x] Remove the refinery video element and video-specific hero styling.
+- [x] Verify the restored static hero, run the Vercel production build, and save the revised checkpoint.

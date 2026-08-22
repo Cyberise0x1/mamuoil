@@ -202,9 +202,6 @@ export default function Home() {
       <main>
         <section id="overview" className="executive-hero" aria-labelledby="hero-title">
           <img className="hero-image" src="/manus-storage/mamu-amber-horizon-hero_493bd35b.jpg" alt="Energy logistics terminal in warm daylight" />
-          <video className="hero-refinery-video" autoPlay muted loop playsInline preload="metadata" poster="/manus-storage/mamu-amber-horizon-hero_493bd35b.jpg" aria-hidden="true">
-            <source src="/manus-storage/mamu-refinery-hero_28b2e03d.mp4" type="video/mp4" />
-          </video>
           <div className="hero-wash" aria-hidden="true" />
           <div className="hero-route" aria-hidden="true"><span /><i /><span /></div>
           <div className="hero-route-label" aria-hidden="true"><span>M</span> Zaria route / 01</div>
