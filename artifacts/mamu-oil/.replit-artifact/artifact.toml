@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "MAMU Oil"
+description = "An immersive corporate website for MAMU Oil presenting petroleum trading, logistics, operations, and direct contact information for customers and partners."
+version = "1.0.0"
+id = "artifacts/mamu-oil"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18345
+
+[services.development]
+run = "pnpm --filter @workspace/mamu-oil run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mamu-oil", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mamu-oil/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18345"
+BASE_PATH = "/"
