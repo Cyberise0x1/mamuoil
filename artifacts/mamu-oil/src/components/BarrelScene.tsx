@@ -7,6 +7,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group, Mesh } from "three";
+import BarrelFallback from "./BarrelFallback";
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smoothstep = (start: number, end: number, value: number) => {
@@ -153,7 +154,7 @@ function Scene({ onExplore }: { onExplore: () => void }) {
   );
 }
 
-export default function BarrelScene({ onExplore }: { onExplore: () => void }) {
+export default function BarrelScene({ onExplore, isActive }: { onExplore: () => void; isActive: boolean }) {
   const supportsWebGl = useMemo(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -167,23 +168,11 @@ export default function BarrelScene({ onExplore }: { onExplore: () => void }) {
   }, []);
 
   if (!supportsWebGl) {
-    return (
-      <button className="barrel-fallback" type="button" onClick={onExplore} aria-label="Inspect the Mamu Oil barrel">
-        <span className="barrel-fallback__cap" />
-        <span className="barrel-fallback__body">
-          <i />
-          <i />
-          <strong>M</strong>
-          <i />
-          <i />
-        </span>
-        <span className="barrel-fallback__cap" />
-      </button>
-    );
+    return <BarrelFallback />;
   }
 
   return (
-    <Canvas className="barrel-canvas" camera={{ position: [0.45, 0.25, 8.6], fov: 34 }} dpr={[1, 1.75]} shadows gl={{ alpha: true, antialias: true }}>
+    <Canvas className="barrel-canvas" camera={{ position: [0.45, 0.25, 8.6], fov: 34 }} dpr={[1, 1.5]} frameloop={isActive ? "always" : "never"} shadows gl={{ alpha: true, antialias: true }}>
       <Scene onExplore={onExplore} />
     </Canvas>
   );

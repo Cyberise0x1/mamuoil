@@ -22,11 +22,13 @@ import {
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import BarrelFallback from "@/components/BarrelFallback";
 
 const BarrelScene = lazy(() => import("@/components/BarrelScene"));
 gsap.registerPlugin(ScrollTrigger);
 
 const asset = (filename: string) => `${import.meta.env.BASE_URL}assets/${filename}`;
+const whatsappUrl = (message: string) => `https://wa.me/2348100737315?text=${encodeURIComponent(message)}`;
 
 const navigation = [
   { label: "Overview", href: "#overview" },
@@ -81,20 +83,88 @@ const capabilities = [
 
 export default function Home() {
   const siteRef = useRef<HTMLDivElement>(null);
+  const barrelRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [barrelActive, setBarrelActive] = useState(false);
+  const [barrelVisible, setBarrelVisible] = useState(true);
+  const [enable3D, setEnable3D] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [activeCapability, setActiveCapability] = useState(0);
-  const [enquirySubmitted, setEnquirySubmitted] = useState(false);
+  const [preparedEnquiryUrl, setPreparedEnquiryUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 300);
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(motionPreference.matches);
+    motionPreference.addEventListener("change", update);
+    return () => motionPreference.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 651px)");
+    const device = navigator as Navigator & {
+      connection?: {
+        saveData?: boolean;
+        addEventListener?: (type: string, listener: () => void) => void;
+        removeEventListener?: (type: string, listener: () => void) => void;
+      };
+      deviceMemory?: number;
+    };
+    const connection = device.connection;
+    let supportsWebGl: boolean | null = null;
+
+    const update = () => {
+      if (!desktop.matches || reducedMotion || connection?.saveData || (device.deviceMemory !== undefined && device.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)) {
+        setEnable3D(false);
+        return;
+      }
+      if (supportsWebGl === null) {
+        try {
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true }) || canvas.getContext("webgl", { failIfMajorPerformanceCaveat: true });
+          supportsWebGl = Boolean(context);
+          context?.getExtension("WEBGL_lose_context")?.loseContext();
+        } catch {
+          supportsWebGl = false;
+        }
+      }
+      setEnable3D(Boolean(supportsWebGl));
+    };
+
+    update();
+    desktop.addEventListener("change", update);
+    connection?.addEventListener?.("change", update);
+    return () => {
+      desktop.removeEventListener("change", update);
+      connection?.removeEventListener?.("change", update);
+    };
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    const barrel = barrelRef.current;
+    if (!barrel || !("IntersectionObserver" in window)) return;
+    let inView = true;
+    const update = () => setBarrelVisible(inView && document.visibilityState === "visible");
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      update();
+    }, { rootMargin: "80px" });
+    observer.observe(barrel);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
+
   useLayoutEffect(() => {
     const site = siteRef.current;
-    if (!site || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!site || reducedMotion) return;
 
     const context = gsap.context(() => {
       gsap.set(".luxury-route-track", { scaleY: 0, transformOrigin: "top center" });
@@ -143,7 +213,7 @@ export default function Home() {
     }, site);
 
     return () => context.revert();
-  }, []);
+  }, [reducedMotion]);
 
   const moveCapability = (direction: number) => {
     setActiveCapability((current) => (current + direction + capabilities.length) % capabilities.length);
@@ -168,8 +238,9 @@ export default function Home() {
       "",
       `Message: ${data.get("message")}`,
     ].join("\n");
-    window.open(`https://wa.me/2348100737315?text=${encodeURIComponent(enquiry)}`, "_blank", "noopener,noreferrer");
-    setEnquirySubmitted(true);
+    const url = whatsappUrl(enquiry);
+    setPreparedEnquiryUrl(url);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const active = capabilities[activeCapability];
@@ -193,10 +264,10 @@ export default function Home() {
           {navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
         </nav>
         <a className="header-contact" href="#contact">Enquire now <ArrowUpRight size={14} /></a>
-        <button className="executive-menu" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
+        <button className="executive-menu" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-controls="mobile-navigation" aria-expanded={menuOpen}>
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <nav className={`executive-mobile-nav ${menuOpen ? "is-open" : ""}`} aria-label="Mobile navigation">
+        <nav id="mobile-navigation" className={`executive-mobile-nav ${menuOpen ? "is-open" : ""}`} aria-label="Mobile navigation" onKeyDown={(event) => { if (event.key === "Escape") setMenuOpen(false); }}>
           {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}
           <a href="#contact" onClick={() => setMenuOpen(false)}>Enquire now <ArrowUpRight size={15} /></a>
         </nav>
@@ -222,11 +293,13 @@ export default function Home() {
             <strong>Local route.<br />Clear response.</strong>
             <p>Fuel / Kerosene / Oil &amp; Gas</p>
           </aside>
-          <div className="hero-barrel" aria-label="Interactive three-dimensional oil barrel. Drag to inspect.">
-            <Suspense fallback={<div className="barrel-loading barrel-loading--light" aria-hidden="true"><span /></div>}>
-              <BarrelScene onExplore={() => setBarrelActive(true)} />
-            </Suspense>
-            <div className={`hero-barrel-readout ${barrelActive ? "is-active" : ""}`}><Orbit size={13} /> {barrelActive ? "Material view active" : "Drag to inspect"}</div>
+          <div className="hero-barrel" ref={barrelRef}>
+            {enable3D ? (
+              <Suspense fallback={<BarrelFallback />}>
+                <BarrelScene onExplore={() => setBarrelActive(true)} isActive={barrelVisible} />
+              </Suspense>
+            ) : <BarrelFallback />}
+            {enable3D && <div className={`hero-barrel-readout ${barrelActive ? "is-active" : ""}`}><Orbit size={13} /> {barrelActive ? "Material view active" : "Drag to inspect"}</div>}
           </div>
           <div className="hero-ribbon" aria-label="Mamu Oil service areas">
             <div><span>01</span><strong>Fuel supply</strong></div>
@@ -254,9 +327,9 @@ export default function Home() {
             <p data-gsap-reveal>Explore a capability for clear product and enquiry detail, then move directly to the right commercial channel.</p>
           </div>
           <div className="capability-focus" data-gsap-reveal>
-            <div className="capability-list" role="tablist" aria-label="Mamu Oil capabilities">
+            <div className="capability-list" role="group" aria-label="Mamu Oil capabilities">
               {capabilities.map((item, index) => (
-                <button key={item.title} className={index === activeCapability ? "is-active" : ""} role="tab" aria-selected={index === activeCapability} onClick={() => setActiveCapability(index)}>
+                <button key={item.title} type="button" className={index === activeCapability ? "is-active" : ""} aria-pressed={index === activeCapability} onClick={() => setActiveCapability(index)}>
                   <span>{item.number}</span><strong>{item.title}</strong><ArrowUpRight size={16} />
                 </button>
               ))}
@@ -277,7 +350,7 @@ export default function Home() {
             <h2 id="operations-title" data-gsap-reveal>Built for the<br /><em>business of movement.</em></h2>
             <p data-gsap-reveal>From a Zaria-rooted operating position, Mamu Oil provides a clear channel for fuel, kerosene, and oil-and-gas enquiries—grounded in local context and handled with direct communication.</p>
             <dl data-gsap-reveal><div><dt>Fuel</dt><dd>Direct supply focus</dd></div><div><dt>Zaria</dt><dd>Kaduna, Nigeria</dd></div></dl>
-            <div className="operations-proof-grid" aria-label="Mamu Oil operational response channels"><div><span>01</span><strong>HQ-Zaria service desk</strong><small>Local response channel</small></div><div><span>02</span><strong>Product enquiry</strong><small>Fuel · Kerosene · Oil &amp; Gas</small></div><div><span>03</span><strong>Direct handoff</strong><small>WhatsApp-ready response</small></div></div>
+            <div className="operations-proof-grid" aria-label="Mamu Oil operational response channels"><div><span>01</span><strong>Zaria contact point</strong><small>Local enquiry channel</small></div><div><span>02</span><strong>Product enquiry</strong><small>Fuel · Kerosene · Oil &amp; Gas</small></div><div><span>03</span><strong>Direct handoff</strong><small>WhatsApp message draft</small></div></div>
             <a className="button button--amber" href="#contact" data-gsap-reveal>Open a supply enquiry <ArrowRight size={16} /></a>
           </div>
         </section>
@@ -291,7 +364,7 @@ export default function Home() {
             <div className="founder-copy">
               <p className="section-index route-marker-motion" data-gsap-reveal>Leadership / Mamu Oil</p>
               <h2 id="founder-title" data-gsap-reveal>Rooted in Zaria.<br /><em>Focused on service.</em></h2>
-              <p data-gsap-reveal>From a Zaria-rooted perspective, Mamu Oil is focused on clear fuel, kerosene, and oil-and-gas enquiries, supported by direct communication with customers and business partners.</p>
+              <p data-gsap-reveal>This portrait introduces the founder of Mamu Oil. Based in Zaria, the company welcomes enquiries about fuel, kerosene, and oil-and-gas services from customers and business partners.</p>
               <div className="founder-identity" data-gsap-reveal>
                 <span>Founder</span>
                 <strong>Mamu Oil</strong>
@@ -308,16 +381,16 @@ export default function Home() {
         </section>
 
         <section id="contact" className="executive-contact gsap-section" aria-labelledby="contact-title">
-          <div className="contact-intro"><p className="section-index route-marker-motion" data-gsap-reveal>Contact / Mamu Oil</p><h2 id="contact-title" data-gsap-reveal>Start with<br /><em>the right channel.</em></h2><p data-gsap-reveal>Share your requirement and Mamu Oil will receive a prepared message directly on WhatsApp.</p><div className="contact-command-strip" aria-label="Mamu Oil contact command"><span>Zaria response desk</span><strong>Fuel / Kerosene / Oil &amp; Gas</strong><small>Direct business handoff</small></div><a href="https://wa.me/2348100737315?text=Hello%20Mamu%20Oil%2C%20I%20would%20like%20to%20make%20an%20enquiry." target="_blank" rel="noreferrer" className="whatsapp-link" data-gsap-reveal><MessageCircle size={18} /> WhatsApp direct <ArrowUpRight size={15} /></a><span className="location-line" data-gsap-reveal><MapPin size={15} /> Zaria, Kaduna, Nigeria</span></div>
-          <form className="executive-form" onSubmit={submitEnquiry} data-gsap-reveal>
+          <div className="contact-intro"><p className="section-index route-marker-motion" data-gsap-reveal>Contact / Mamu Oil</p><h2 id="contact-title" data-gsap-reveal>Start with<br /><em>the right channel.</em></h2><p data-gsap-reveal>Share your requirement to prepare a WhatsApp message. Review it and tap Send in WhatsApp to deliver your enquiry.</p><div className="contact-command-strip" aria-label="Mamu Oil contact command"><span>Zaria contact</span><strong>Fuel / Kerosene / Oil &amp; Gas</strong><small>Direct business enquiry</small></div><a href={whatsappUrl("Hello Mamu Oil, I would like to make an enquiry.")} target="_blank" rel="noopener noreferrer" className="whatsapp-link" data-gsap-reveal><MessageCircle size={18} /> WhatsApp direct <ArrowUpRight size={15} /></a><span className="location-line" data-gsap-reveal><MapPin size={15} /> Zaria, Kaduna, Nigeria</span></div>
+          <form className="executive-form" onSubmit={submitEnquiry} onChange={() => setPreparedEnquiryUrl(null)} data-gsap-reveal>
             <div className="form-header"><span>Business enquiry</span><span>WhatsApp handoff</span></div>
             <label><span>Your name</span><input required name="name" autoComplete="name" placeholder="Full name" /></label>
             <label><span>Email address</span><input required type="email" name="email" autoComplete="email" placeholder="name@company.com" /></label>
             <label><span>Phone number</span><input type="tel" name="phone" autoComplete="tel" placeholder="Optional" /></label>
             <label><span>Enquiry type</span><select required name="service" defaultValue=""><option value="" disabled>Select a requirement</option><option>Fuel supply</option><option>Kerosene supply</option><option>Oil &amp; gas enquiry</option><option>Business partnership</option><option>General enquiry</option></select></label>
             <label className="message-field"><span>Tell us what you need</span><textarea required name="message" rows={5} placeholder="Share the requirement, quantity, location, or business context." /></label>
-            <button className="form-submit" type="submit"><Send size={16} /> Send via WhatsApp</button>
-            {enquirySubmitted && <p className="form-status" role="status">Your WhatsApp enquiry is prepared in a new window.</p>}
+            <button className="form-submit" type="submit"><Send size={16} /> Prepare WhatsApp message</button>
+            {preparedEnquiryUrl && <p className="form-status" role="status">Your message is ready. Review it and tap Send in WhatsApp. If WhatsApp did not open, <a href={preparedEnquiryUrl} target="_blank" rel="noopener noreferrer">open your prepared message here</a>.</p>}
           </form>
         </section>
       </main>
