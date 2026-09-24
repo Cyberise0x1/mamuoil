@@ -32,6 +32,7 @@ const navigation = [
   { label: "Overview", href: "#overview" },
   { label: "Capabilities", href: "#capabilities" },
   { label: "Operations", href: "#operations" },
+  { label: "Leadership", href: "#leadership" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -278,6 +279,26 @@ export default function Home() {
             <dl data-gsap-reveal><div><dt>Fuel</dt><dd>Direct supply focus</dd></div><div><dt>Zaria</dt><dd>Kaduna, Nigeria</dd></div></dl>
             <div className="operations-proof-grid" aria-label="Mamu Oil operational response channels"><div><span>01</span><strong>HQ-Zaria service desk</strong><small>Local response channel</small></div><div><span>02</span><strong>Product enquiry</strong><small>Fuel · Kerosene · Oil &amp; Gas</small></div><div><span>03</span><strong>Direct handoff</strong><small>WhatsApp-ready response</small></div></div>
             <a className="button button--amber" href="#contact" data-gsap-reveal>Open a supply enquiry <ArrowRight size={16} /></a>
+          </div>
+        </section>
+
+        <section id="leadership" className="founder-section gsap-section" aria-labelledby="founder-title">
+          <div className="founder-frame">
+            <figure className="founder-portrait-wrap" data-gsap-reveal>
+              <img src={asset("founder-portrait.webp")} alt="Portrait of the founder of Mamu Oil" loading="lazy" />
+              <figcaption>Founder / Mamu Oil</figcaption>
+            </figure>
+            <div className="founder-copy">
+              <p className="section-index route-marker-motion" data-gsap-reveal>Leadership / Mamu Oil</p>
+              <h2 id="founder-title" data-gsap-reveal>Rooted in Zaria.<br /><em>Focused on service.</em></h2>
+              <p data-gsap-reveal>From a Zaria-rooted perspective, Mamu Oil is focused on clear fuel, kerosene, and oil-and-gas enquiries, supported by direct communication with customers and business partners.</p>
+              <div className="founder-identity" data-gsap-reveal>
+                <span>Founder</span>
+                <strong>Mamu Oil</strong>
+                <small>Fuel · Kerosene · Oil &amp; Gas</small>
+              </div>
+              <a className="founder-contact-link" href="#contact" data-gsap-reveal>Connect with Mamu Oil <ArrowRight size={16} /></a>
+            </div>
           </div>
         </section>
 
